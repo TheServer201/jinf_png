@@ -22,6 +22,7 @@
 
 #define IHDR 0x52444849
 #define IDAT 0x54414449
+#define IEND 0x444E4549
 
 int tinf_png_inspect(const void *source, tinf_png_info *info)
 {
@@ -32,15 +33,15 @@ int tinf_png_inspect(const void *source, tinf_png_info *info)
 	
 	/* -- check format -- */
 	sgt = RdQword(src);
-	len = RsDword(cur);
-	typ = RdDword(cur);
-	wid = RsDword(cur);
-	hei = RsDword(cur);
-	dep = RdByte(cur);
-	clt = RdByte(cur);
-	cpm = RdByte(cur);
-	ftm = RdByte(cur);
-	itm = RdByte(cur);
+	len = RsDword(src);
+	typ = RdDword(src);
+	wid = RsDword(src);
+	hei = RsDword(src);
+	dep = RdByte(src);
+	clt = RdByte(src);
+	cpm = RdByte(src);
+	ftm = RdByte(src);
+	itm = RdByte(src);
 	
 	if (sgt != PNGS) return TINF_DATA_ERROR;
 	if (len != 0x0D) return TINF_DATA_ERROR;
@@ -53,16 +54,17 @@ int tinf_png_inspect(const void *source, tinf_png_info *info)
 	if (itm != 0x00) return TINF_DATA_ERROR;
 	
 	/* -- extract infos -- */
+	dep *= 4;
 	info->width = wid;
 	info->height = hei;
 	info->depth = dep;
 	info->size = hei + ((wid * hei) / 8) * dep;
-	indo->data = src + 4;
+	info->data = src + 4;
 	
 	return TINF_OK;
 }
 
-int tinf_png_uncompress(void *dest, tinf_png_info info)
+int tinf_png_uncompress(tinf_png_info info, void *dest)
 {
 	uint8_t *src = info.data,
 			*dst = (uint8_t *)dest;
@@ -75,6 +77,7 @@ int tinf_png_uncompress(void *dest, tinf_png_info info)
 		
 		switch (typ) {
 			case IDAT:
+			{
 				/* -- inflate -- */
 				uint32_t siz;
 				
@@ -84,14 +87,12 @@ int tinf_png_uncompress(void *dest, tinf_png_info info)
 				
 				dst += siz;
 				break;
+			}
 			case IEND:
 				goto Done;
-			default:
-				src += len;
-				break;
 		}
 		
-		src += 4;
+		src += len + 4;
 	} while(0x01);
 	
 Done:
