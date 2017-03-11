@@ -10,7 +10,7 @@
 ##
 
 target  = ..\lib\tinf.lib
-objects = tinflate.obj tinfgzip.obj tinfzlib.obj adler32.obj crc32.obj
+objects = tinflate.obj tinfgzip.obj tinfzlib.obj tinfpng.obj adler32.obj crc32.obj
 system  = nt
 
 cflags  = -bt=$(system) -d0 -obmlrs -s -zl
