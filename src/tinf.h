@@ -25,6 +25,16 @@
 extern "C" {
 #endif
 
+#include "bswap.h"
+
+typedef struct {
+	int32_t width;
+	int32_t height;
+	uint32_t depth;
+	uint32_t size;
+	uint8_t *data;
+} tinf_png_info;
+
 #define TINF_OK             0
 #define TINF_DATA_ERROR    (-3)
 
@@ -40,6 +50,12 @@ int TINFCC tinf_gzip_uncompress(void *dest, unsigned int *destLen,
 
 int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
                                 const void *source, unsigned int sourceLen);
+
+int TINFCC tinf_png_inspect(const void *source,
+							tinf_png_info *info);
+
+int TINFCC tinf_png_uncompress(tinf_png_info info,
+							   void *dest);
 
 unsigned int TINFCC tinf_adler32(const void *data, unsigned int length);
 
