@@ -54,11 +54,10 @@ int tinf_png_inspect(const void *source, tinf_png_info *info)
 	if (itm != 0x00) return TINF_DATA_ERROR;
 	
 	/* -- extract infos -- */
-	dep *= 4;
 	info->width = wid;
 	info->height = hei;
 	info->depth = dep;
-	info->size = hei + ((wid * hei) / 8) * dep;
+	info->size = hei + (wid * hei * dep) / 2;
 	info->data = src + 4;
 	
 	return TINF_OK;
@@ -66,8 +65,7 @@ int tinf_png_inspect(const void *source, tinf_png_info *info)
 
 int tinf_png_uncompress(tinf_png_info info, void *dest)
 {
-	uint8_t *src = info.data,
-			*dst = (uint8_t *)dest;
+	uint8_t *src = info.data, *dst = (uint8_t *)dest, *tmp = dst;
 	uint32_t len, typ;
 	
 	/* -- foreach chunks -- */
@@ -85,11 +83,29 @@ int tinf_png_uncompress(tinf_png_info info, void *dest)
 				
 				if (res != TINF_OK) return res;
 				
+				// unfilter(dst, dst, info.width, info.height, info.depth);
+				
 				dst += siz;
 				break;
 			}
 			case IEND:
+			{
+				/* -- unfilter -- */
+				uint32_t bpl = (info.width * info.depth) / 2;
+				
+				for(uint32_t i = 0; i < info.height; i++){
+					uint32_t out = bpl * i,
+							 inp = out + i;
+					
+					uint8_t flm = tmp[inp++];
+					
+					if (flm != 0x00) return TINF_DATA_ERROR;
+					
+					memcpy(tmp + out, tmp + inp, bpl);
+				}
+				
 				goto Done;
+			}
 		}
 		
 		src += len + 4;
