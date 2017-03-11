@@ -83,8 +83,6 @@ int tinf_png_uncompress(tinf_png_info info, void *dest)
 				
 				if (res != TINF_OK) return res;
 				
-				// unfilter(dst, dst, info.width, info.height, info.depth);
-				
 				dst += siz;
 				break;
 			}
@@ -94,8 +92,7 @@ int tinf_png_uncompress(tinf_png_info info, void *dest)
 				uint32_t bpl = (info.width * info.depth) / 2;
 				
 				for(uint32_t i = 0; i < info.height; i++){
-					uint32_t out = bpl * i,
-							 inp = out + i;
+					uint32_t out = bpl * i, inp = out + i;
 					
 					uint8_t flm = tmp[inp++];
 					
