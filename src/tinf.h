@@ -51,11 +51,9 @@ int TINFCC tinf_gzip_uncompress(void *dest, unsigned int *destLen,
 int TINFCC tinf_zlib_uncompress(void *dest, unsigned int *destLen,
                                 const void *source, unsigned int sourceLen);
 
-int TINFCC tinf_png_inspect(const void *source,
-							tinf_png_info *info);
+int TINFCC tinf_png_inspect(const void *source, tinf_png_info *info);
 
-int TINFCC tinf_png_uncompress(tinf_png_info info,
-							   void *dest);
+int TINFCC tinf_png_uncompress(tinf_png_info info, void *dest);
 
 unsigned int TINFCC tinf_adler32(const void *data, unsigned int length);
 
