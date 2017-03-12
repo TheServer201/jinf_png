@@ -33,7 +33,7 @@ int tinf_png_inspect(const void *source, tinf_png_info *info)
 	
 	/* -- check format -- */
 	sgt = RdQword(src);
-	len = RsDword(src);
+	len = RdDword(src);
 	typ = RdDword(src);
 	wid = RsDword(src);
 	hei = RsDword(src);
@@ -44,7 +44,7 @@ int tinf_png_inspect(const void *source, tinf_png_info *info)
 	itm = RdByte(src);
 	
 	if (sgt != PNGS) return TINF_DATA_ERROR;
-	if (len != 0x0D) return TINF_DATA_ERROR;
+	if (len != 0x0D000000) return TINF_DATA_ERROR;
 	if (typ != IHDR) return TINF_DATA_ERROR;
 	if (wid <= 0x00 || hei <= 0x00) return TINF_DATA_ERROR;
 	if (dep != 0x08 && dep != 0x10) return TINF_DATA_ERROR;
@@ -91,7 +91,7 @@ int tinf_png_uncompress(tinf_png_info info, void *dest)
 				/* -- unfilter -- */
 				uint32_t bpl = (info.width * info.depth) / 2;
 				
-				for(uint32_t i = 0; i < info.height; i++){
+				for (uint32_t i = 0; i < info.height; i++) {
 					uint32_t out = bpl * i, inp = out + i;
 					
 					uint8_t flm = tmp[inp++];
@@ -100,7 +100,6 @@ int tinf_png_uncompress(tinf_png_info info, void *dest)
 					
 					memcpy(tmp + out, tmp + inp, bpl);
 				}
-				
 				goto Done;
 			}
 		}
